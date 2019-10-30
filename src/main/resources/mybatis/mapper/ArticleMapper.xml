@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.blog.blogsystem.mapper.ArticleMapper">
+
+    <insert id="insert" useGeneratedKeys="true"  keyProperty="id" parameterType="com.ly.blog.blogsystem.bean.Article">
+        insert into article (title,user_id,create_time,update_time,summary,class_id) values (#{title},#{userId},#{createTime},#{updateTime},#{summary},#{classId})
+    </insert>
+
+    <select id="findByIdAndUserId" resultType="com.ly.blog.blogsystem.bean.Article">
+        select * from article where id = #{articleId} and user_id=#{userId}
+    </select>
+
+    <update id="update">
+        update article
+        <set>
+            <if test="title!=null and title!=''">
+                title = #{title},
+            </if>
+            <if test="updateTime!=null">
+                update_time = #{updateTime},
+            </if>
+            <if test="summary !=null and summary!=''">
+                summary = #{summary},
+            </if>
+            <if test="pollCount !=null and pollCount!=''">
+                poll_count = #{pollCount},
+            </if>
+            <if test="commentCount !=null and commentCount!=''">
+                comment_count = #{commentCount},
+            </if>
+            <if test="readCount !=null and readCount!=''">
+                read_count = #{readCount},
+            </if>
+            <if test="classId !=null and classId!=''">
+                class_id = #{classId},
+            </if>
+            <if test="isEssence !=null and isEssence!=''">
+                is_essence = #{isEssence},
+            </if>
+            <if test="isTop !=null and isTop!=''">
+                is_top = #{isTop}
+            </if>
+        </set>
+        <where>
+            user_id = #{userId} and id = #{id}
+        </where>
+    </update>
+
+    <delete id="delete">
+        delete from article
+        where id=#{articleId} and user_id =#{userId}
+    </delete>
+
+    <select id="findAllByUserId" resultType="com.ly.blog.blogsystem.bean.Article">
+        select * from article
+        where user_id = #{userId}
+    </select>
+
+    <select id="findAll" resultType="com.ly.blog.blogsystem.bean.Article">
+         select * from article
+    </select>
+
+    <select id="findTitleById" resultType="String">
+        select title from article where id = #{articleId}
+    </select>
+
+    <select id="findById" resultType="com.ly.blog.blogsystem.bean.Article">
+        select * from article where id = #{articleId}
+    </select>
+
+</mapper>

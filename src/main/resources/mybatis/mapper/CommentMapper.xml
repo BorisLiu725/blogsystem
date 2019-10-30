@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ly.blog.blogsystem.mapper.CommentMapper">
+
+    <insert id="insert">
+        insert into comment (`time`,content,user_id,article_id,father_comment,state,ip_address) values (#{time},#{content},#{userId},#{articleId},#{fatherComment},#{state},#{ipAddress});
+    </insert>
+
+    <select id="selectAllRoot" resultType="com.ly.blog.blogsystem.bean.Comment">
+        select * from comment where father_comment is null
+    </select>
+
+    <select id="findByFatherId" resultType="com.ly.blog.blogsystem.bean.Comment">
+        select * from comment
+        where father_comment = #{fatherComment}
+    </select>
+
+    <select id="findById" resultType="com.ly.blog.blogsystem.bean.Comment">
+        select * from comment
+        where id = #{id}
+    </select>
+
+    <select id="findByArticleId" resultType="com.ly.blog.blogsystem.bean.Comment">
+        select * from comment
+        where article_id = #{articleId}
+    </select>
+
+</mapper>
