@@ -1,6 +1,7 @@
 package com.ly.blog.blogsystem.service;
 
 import com.github.pagehelper.PageInfo;
+import com.ly.blog.blogsystem.bean.Comment;
 import com.ly.blog.blogsystem.dto.ArticleDTO;
 import com.ly.blog.blogsystem.dto.CommentDTO;
 import com.ly.blog.blogsystem.vo.CommentFormatLsitVO;
@@ -23,4 +24,7 @@ public interface CommentService  {
     List<CommentFormatLsitVO> findFormatCommentsAboutArticleId(Integer articleId);
 
 
+    PageInfo<Comment> findAllByState(Integer state, Integer curPage, Integer pageSize);
+
+    boolean updateCommentStateById(Integer state, Integer id);
 }

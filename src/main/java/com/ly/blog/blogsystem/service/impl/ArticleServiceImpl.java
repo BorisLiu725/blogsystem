@@ -3,9 +3,9 @@ package com.ly.blog.blogsystem.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.ly.blog.blogsystem.bean.Article;
-import com.ly.blog.blogsystem.bean.ArticleDetail;
+import com.ly.blog.blogsystem.bean.*;
 import com.ly.blog.blogsystem.dto.ArticleDTO;
+import com.ly.blog.blogsystem.dto.ArticleFollowsDTO;
 import com.ly.blog.blogsystem.dto.PageResult;
 import com.ly.blog.blogsystem.exception.ArticleException;
 import com.ly.blog.blogsystem.mapper.ArticleDetailMapper;
@@ -13,10 +13,15 @@ import com.ly.blog.blogsystem.mapper.ArticleMapper;
 import com.ly.blog.blogsystem.mapper.ClassficationMapper;
 import com.ly.blog.blogsystem.mapper.CommentMapper;
 import com.ly.blog.blogsystem.service.ArticleService;
+import com.ly.blog.blogsystem.service.CommentService;
+import com.ly.blog.blogsystem.service.UserFollowRedisService;
+import com.ly.blog.blogsystem.service.UserService;
+import com.ly.blog.blogsystem.vo.CommentFormatLsitVO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -43,6 +48,13 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Autowired
     private CommentMapper commentMapper;
+    @Autowired
+    private UserService userService;
+    @Autowired
+    private UserFollowRedisService userFollowRedisService;
+
+    @Autowired
+    private CommentService commentService;
 
     /**
      * 发表文章
@@ -62,6 +74,7 @@ public class ArticleServiceImpl implements ArticleService {
         logger.info("用户{}==>开始发表文章",userId);
         articleMapper.insert(article);
         articleDetail.setContent(articleDTO.getContent());
+        articleDetail.setContentMd(articleDTO.getContentMd());
         articleDetail.setArticleId(article.getId());
         logger.info("用户{}==>开始插入文章详情==>",userId);
         articleDetailMapper.insert(articleDetail);
@@ -82,7 +95,7 @@ public class ArticleServiceImpl implements ArticleService {
         logger.info("用户{}==>开始更新文章:id:{}",userId,articleId);
         articleMapper.update(articleRecord);
         logger.info("用户{}==>开始更新文章详情:articleId:{}",userId,articleId);
-        articleDetailMapper.update(articleId,articleDTO.getContent());
+        articleDetailMapper.update(articleId,articleDTO.getContent(),articleDTO.getContentMd());
         logger.info("用户{}==>更新文章完成！",userId);
     }
 
@@ -100,6 +113,8 @@ public class ArticleServiceImpl implements ArticleService {
         for (int i = 0; i < articles.size(); i++) {
             ArticleDTO articleDTO = new ArticleDTO();
             BeanUtils.copyProperties(articles.get(i),articleDTO);
+            Classfication classfication = classficationMapper.findById(articles.get(i).getClassId());
+            articleDTO.setClassfication(classfication);
             ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articles.get(i).getId());
             articleDTO.setArticleDetail(articleDetail);
             articleDTOList.add(articleDTO);
@@ -118,12 +133,118 @@ public class ArticleServiceImpl implements ArticleService {
         for (int i = 0; i < articles.size(); i++) {
             ArticleDTO articleDTO = new ArticleDTO();
             BeanUtils.copyProperties(articles.get(i),articleDTO);
+            Classfication classfication = classficationMapper.findById(articles.get(i).getClassId());
+
             ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articles.get(i).getId());
             articleDTO.setArticleDetail(articleDetail);
+            articleDTO.setClassfication(classfication);
+
             articleDTOList.add(articleDTO);
         }
         PageInfo<ArticleDTO> pageInfo = new PageInfo<>(articleDTOList);
         articles = null;
         return pageInfo;
     }
+
+    @Override
+    public PageInfo<ArticleDTO> findAllByClassfication(Integer classficationId,Integer curPage, Integer pageSize) {
+        PageHelper.startPage(curPage,pageSize);
+        List<ArticleDTO> articleDTOList = new ArrayList<>();
+        List<Article> articles = articleMapper.findAllByClassfication(classficationId);
+        Classfication classfication = classficationMapper.findById(classficationId);
+        if (Objects.isNull(classfication)){
+            return null;
+        }
+        for (int i = 0; i < articles.size(); i++) {
+            ArticleDTO articleDTO = new ArticleDTO();
+            BeanUtils.copyProperties(articles.get(i),articleDTO);
+            ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articles.get(i).getId());
+            articleDTO.setArticleDetail(articleDetail);
+            articleDTO.setClassfication(classfication);
+            articleDTOList.add(articleDTO);
+
+        }
+        articles = null;
+        PageInfo<ArticleDTO> pageInfo = new PageInfo<>(articleDTOList);
+        return pageInfo;
+    }
+
+    @Override
+    public ArticleFollowsDTO findById(Integer articleId) {
+        Article article = articleMapper.findById(articleId);
+        if (Objects.isNull(article)){
+            return null;
+        }
+        User user = userService.findById(article.getUserId());
+
+        Classfication classfication = classficationMapper.findById(article.getClassId());
+        ArticleFollowsDTO articleFollowsDTO = new ArticleFollowsDTO();
+        BeanUtils.copyProperties(article,articleFollowsDTO);
+        articleFollowsDTO.setClassfication(classfication);
+        ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articleId);
+        articleFollowsDTO.setArticleDetail(articleDetail);
+        articleFollowsDTO.setUser(user);
+
+        int size = articleMapper.findAllByUserId(article.getUserId()).size();
+        articleFollowsDTO.setArticlesCount((long) size);
+        articleFollowsDTO.setFollowCount(userFollowRedisService.myFollowCount(article.getUserId()));
+        articleFollowsDTO.setFansCount(userFollowRedisService.myFansCount(article.getUserId()));
+        articleFollowsDTO.setFollowed(false);
+
+        List<CommentFormatLsitVO> commentFormatLsitVO = commentService.findFormatCommentsAboutArticleId(articleId);
+        articleFollowsDTO.setComments(commentFormatLsitVO);
+        return articleFollowsDTO;
+    }
+
+    @Override
+    public boolean updateStateById(Integer state, Integer articleId) {
+        Integer res = articleMapper.updateStateById(articleId, state);
+        return res > 0;
+    }
+
+    @Override
+    public PageInfo<ArticleDTO> findAllByUserIdAndState(String userId, Integer state, Integer curPage, Integer pageSize) {
+        PageHelper.startPage(curPage,pageSize);
+        List<ArticleDTO> articleDTOList = new ArrayList<>();
+        List<Article> articles = articleMapper.findAllByUserIdAndState(userId,state);
+        for (int i = 0; i < articles.size(); i++) {
+            ArticleDTO articleDTO = new ArticleDTO();
+            BeanUtils.copyProperties(articles.get(i),articleDTO);
+            Classfication classfication = classficationMapper.findById(articles.get(i).getClassId());
+            articleDTO.setClassfication(classfication);
+            ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articles.get(i).getId());
+            articleDTO.setArticleDetail(articleDetail);
+            articleDTOList.add(articleDTO);
+        }
+        articles = null;
+        PageInfo<ArticleDTO> pageInfo = new PageInfo<>(articleDTOList);
+        return pageInfo;
+
+
+    }
+
+    @Override
+    public PageInfo<ArticleDTO> findAllByState(Integer state, Integer curPage, Integer pageSize) {
+        PageHelper.startPage(curPage,pageSize);
+        List<ArticleDTO> articleDTOList = new ArrayList<>();
+        List<Article> articles = articleMapper.findAllByState(state);
+        for (int i = 0; i < articles.size(); i++) {
+            ArticleDTO articleDTO = new ArticleDTO();
+            BeanUtils.copyProperties(articles.get(i),articleDTO);
+            Classfication classfication = classficationMapper.findById(articles.get(i).getClassId());
+            articleDTO.setClassfication(classfication);
+            ArticleDetail articleDetail = articleDetailMapper.findByArticleId(articles.get(i).getId());
+            articleDTO.setArticleDetail(articleDetail);
+            articleDTO.setContent(articleDetail.getContent());
+            articleDTO.setContent(articleDetail.getContentMd());
+            articleDTOList.add(articleDTO);
+        }
+        articles = null;
+        PageInfo<ArticleDTO> pageInfo = new PageInfo<>(articleDTOList);
+        return pageInfo;
+    }
+
+
+
+
 }

@@ -29,4 +29,36 @@
         select user_name from user where user_id = #{userId}
     </select>
 
+    <update id="updateUserStateById">
+        update `user`
+        set state = #{state}
+        where  user_id = #{userId}
+    </update>
+
+    <update id="updateUserById">
+        update `user`
+        <set>
+            <if test="userName!=null and userName!=''">
+                user_name = #{userName},
+            </if>
+            <if test="sex!=null and sex!=''">
+                sex = #{sex},
+            </if>
+            <if test="birthday!=null and birthday!=''">
+                birthday =  #{birthday},
+            </if>
+            <if test="briefInfo!=null and briefInfo!=''">
+                brief_info = #{briefInfo}
+            </if>
+        </set>
+        <where>
+            user_id = #{userId}
+        </where>
+    </update>
+
+    <update id="updatePasswordById" >
+        update `user`
+        set password = #{password}
+        where user_id = #{userId}
+    </update>
 </mapper>

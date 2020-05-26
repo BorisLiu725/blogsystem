@@ -26,4 +26,12 @@ public interface ArticleMapper {
     String findTitleById(@Param("articleId")Integer articleId);
 
     Article findById(@Param("articleId")Integer articleId);
+
+    List<Article> findAllByClassfication(@Param("classficationId")Integer classficationId);
+
+    Integer updateStateById(@Param("articleId")Integer articleId,@Param("state")Integer state);
+
+    List<Article> findAllByUserIdAndState(@Param("userId")String userId,@Param("state")Integer state);
+
+    List<Article> findAllByState(@Param("state")Integer state);
 }

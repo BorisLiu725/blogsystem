@@ -59,8 +59,28 @@
         "claims": null
     }
 
-
-
+### 检查用户名和邮箱
+    url:http://localhost:8080/user/check
+    请求类型：post
+    参数类型: json
+    样例：
+        {
+        	"type":1,
+        	"target":"132"
+        }
+    返回值：
+        {
+            "code": 200,
+            "msg": "OK",
+            "result": false
+        }
+        
+        false：代表这个被注册了
+        true：代表没有被注册，表示可用
+        
+    解释：
+        type:1 代表检查用户名
+        tyoe：2 代表检查邮箱
 
 ## 文章
 ### 发表文章

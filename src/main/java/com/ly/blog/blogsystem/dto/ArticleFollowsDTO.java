@@ -1,19 +1,23 @@
-package com.ly.blog.blogsystem.bean;
+package com.ly.blog.blogsystem.dto;
 
-import com.ly.blog.blogsystem.bean.base.BaseModel;
+import com.ly.blog.blogsystem.bean.ArticleDetail;
+import com.ly.blog.blogsystem.bean.Classfication;
+import com.ly.blog.blogsystem.bean.User;
+import com.ly.blog.blogsystem.vo.CommentFormatLsitVO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by BorisLiu on 2019/10/6
  */
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-public class Article extends BaseModel {
+@AllArgsConstructor
+public class ArticleFollowsDTO {
     private Integer id;
     private String title;
     private String userId;
@@ -26,10 +30,20 @@ public class Article extends BaseModel {
     private Integer classId;
     private boolean isEssence;
     private boolean isTop;
-    private Integer state;
+    private String content;
+    private String contentMd;
+    private ArticleDetail articleDetail;
+    private Classfication classfication;
+    private List<CommentFormatLsitVO> comments;
+    private User user;
+    private Long followCount;
+    private Long fansCount;
+    private Long articlesCount;
+    private boolean followed;
+
     @Override
     public String toString() {
-        return "Article{" +
+        return "ArticleDTO{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", userId='" + userId + '\'' +
@@ -42,6 +56,8 @@ public class Article extends BaseModel {
                 ", classId=" + classId +
                 ", isEssence=" + isEssence +
                 ", isTop=" + isTop +
+                ", content='" + content + '\'' +
+                ", articleDetail=" + articleDetail +
                 '}';
     }
 }

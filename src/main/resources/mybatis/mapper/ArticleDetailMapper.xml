@@ -5,7 +5,7 @@
 <mapper namespace="com.ly.blog.blogsystem.mapper.ArticleDetailMapper">
 
     <insert id="insert">
-        insert into article_detail (article_id,content) values (#{articleId},#{content});
+        insert into article_detail (article_id,content,content_md) values (#{articleId},#{content},#{contentMd});
     </insert>
 
     <select id="findByArticleId" resultType="com.ly.blog.blogsystem.bean.ArticleDetail">
@@ -14,7 +14,7 @@
 
     <update id="update">
         update article_detail
-        set  content=#{content}
+        set  content=#{content},content_md=#{contentMd}
         where article_id=#{articleId}
     </update>
 

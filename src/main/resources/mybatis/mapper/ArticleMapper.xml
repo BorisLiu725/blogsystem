@@ -9,7 +9,7 @@
     </insert>
 
     <select id="findByIdAndUserId" resultType="com.ly.blog.blogsystem.bean.Article">
-        select * from article where id = #{articleId} and user_id=#{userId}
+        select * from article where id = #{articleId} and user_id=#{userId} and state = 1
     </select>
 
     <update id="update">
@@ -59,7 +59,7 @@
     </select>
 
     <select id="findAll" resultType="com.ly.blog.blogsystem.bean.Article">
-         select * from article
+         select * from article where state = 1
     </select>
 
     <select id="findTitleById" resultType="String">
@@ -68,6 +68,25 @@
 
     <select id="findById" resultType="com.ly.blog.blogsystem.bean.Article">
         select * from article where id = #{articleId}
+    </select>
+
+    <select id="findAllByClassfication" resultType="com.ly.blog.blogsystem.bean.Article">
+         select * from article where class_id = #{classficationId}
+    </select>
+
+    <update id="updateStateById">
+        update article
+        set state = #{state}
+        where id = #{articleId}
+    </update>
+    
+    <select id="findAllByState" resultType="com.ly.blog.blogsystem.bean.Article">
+        select * from article WHERE state = #{state}
+    </select>
+
+    <select id="findAllByUserIdAndState" resultType="com.ly.blog.blogsystem.bean.Article">
+        select * from article
+        where user_id = #{userId} and state = #{state}
     </select>
 
 </mapper>

@@ -28,16 +28,16 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * 跨域请求拦截器
      * */
-//    @Bean
-//    public FilterRegistrationBean registrationBean(){
-//        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
-//        CrossDomainFilter crossDomainFilter = new CrossDomainFilter();
-//        registrationBean.setFilter(crossDomainFilter);
-//        List<String> urls = new ArrayList<>();
-//        urls.add("/*");
-//        registrationBean.setUrlPatterns(urls);
-//        return registrationBean;
-//    }
+    @Bean
+    public FilterRegistrationBean registrationBean(){
+        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
+        CrossDomainFilter crossDomainFilter = new CrossDomainFilter();
+        registrationBean.setFilter(crossDomainFilter);
+        List<String> urls = new ArrayList<>();
+        urls.add("/*");
+        registrationBean.setUrlPatterns(urls);
+        return registrationBean;
+    }
 //    @Bean
 //    public FilterRegistrationBean registrationBean(){
 //        FilterRegistrationBean registrationBean = new FilterRegistrationBean();
@@ -56,10 +56,11 @@ public class WebConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/user/register","/user/login")
+                .excludePathPatterns("/user/register","/user/login","/user/check/**")
                 .excludePathPatterns("/swagger-ui.html","/swagger-resources/**","/webjars/**","/swagger-ui.html/**","/v2/**")
-                .excludePathPatterns("/article/find/list/**")
+                .excludePathPatterns("/article/find/**")
                 .excludePathPatterns("/comment/find/**")
+                .excludePathPatterns("/user/find/**")
                 .excludePathPatterns("/classfication/find/**");
     }
 

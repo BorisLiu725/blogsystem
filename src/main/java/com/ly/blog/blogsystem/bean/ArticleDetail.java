@@ -14,4 +14,6 @@ public class ArticleDetail {
     private Integer id;
     private Integer articleId;
     private String content;
+    private String contentMd;
+
 }

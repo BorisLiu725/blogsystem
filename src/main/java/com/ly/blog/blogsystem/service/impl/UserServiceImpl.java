@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -29,6 +30,7 @@ public class UserServiceImpl implements UserService {
 
     private Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
+    @Override
     public User findByUsernameAndPassword(String userName, String password) {
         return userMapper.findByUsernameAndPassword(userName,password);
     }
@@ -36,7 +38,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void registerUser(RegisterDTO registerDTO) {
         String userId = UuidUtils.getUUid();
-        User user = new User(userId,registerDTO.getUserName(),registerDTO.getPassword(),registerDTO.getEmail(),null);
+        User user = new User(userId,registerDTO.getUserName(),registerDTO.getPassword(),registerDTO.getEmail(),null,null,null,null,null);
         if (!check(user)){
             throw new UserException("用户名或邮箱重复！");
         }
@@ -57,11 +59,55 @@ public class UserServiceImpl implements UserService {
         }else if (UserCheckEnum.EMAIL.equals(userCheckEnum)){
             user = userMapper.findByEmail(target);
         }
+        logger.info(userCheckEnum+"==>"+target+"==>check==>user:"+user);
         // 说明没有重复，校验通过
         if (Objects.isNull(user)){
             return true;
         }
         return false;
+    }
+
+    @Override
+    public User findByToken(String userId) {
+        return userMapper.findById(userId);
+    }
+
+    @Override
+    public User findById(String userId) {
+        return userMapper.findById(userId);
+    }
+
+    @Override
+    public boolean updateUserById(User user) {
+       Integer res =  userMapper.updateUserById(user);
+        return res > 0;
+    }
+
+    @Override
+    public boolean updateUserStateById(String userId, Integer state) {
+        Integer res = userMapper.updateUserStateById(userId, state);
+        return res > 0;
+    }
+
+    @Override
+    public boolean updatePasswordById(String userId, String oldPassword,String newPassword) {
+        User user = userMapper.findById(userId);
+        if (Objects.isNull(user)){
+            return false;
+        }
+
+        if (!oldPassword.equals(user.getPassword())){
+            return false;
+        }
+
+        Integer res = userMapper.updatePasswordById(userId, newPassword);
+
+        return res > 0;
+    }
+
+    @Override
+    public List<User> findAll() {
+        return userMapper.findAll();
     }
 
 

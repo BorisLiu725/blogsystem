@@ -2,6 +2,7 @@ package com.ly.blog.blogsystem.service;
 
 import com.github.pagehelper.PageInfo;
 import com.ly.blog.blogsystem.dto.ArticleDTO;
+import com.ly.blog.blogsystem.dto.ArticleFollowsDTO;
 import com.ly.blog.blogsystem.dto.PageResult;
 
 import java.util.List;
@@ -20,4 +21,14 @@ public interface ArticleService {
     PageInfo<ArticleDTO> findAllByUserId(String userId, Integer curPage, Integer pageSize);
 
     PageInfo<ArticleDTO> findAll(Integer curPage, Integer pageSize);
+
+    PageInfo<ArticleDTO> findAllByClassfication(Integer classficationId,Integer curPage, Integer pageSize);
+
+    ArticleFollowsDTO findById(Integer articleId);
+
+    boolean updateStateById(Integer state,Integer articleId);
+
+    PageInfo<ArticleDTO> findAllByUserIdAndState(String userId,Integer state, Integer curPage, Integer pageSize);
+
+    PageInfo<ArticleDTO> findAllByState(Integer state, Integer curPage, Integer pageSize);
 }

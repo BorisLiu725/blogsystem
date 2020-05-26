@@ -28,6 +28,7 @@ public class ClassficationController {
         return classficationService.findAll();
     }
 
+
     @ApiOperation(value = "添加分类")
     @ApiImplicitParam(name = "classfication",value = "文章分类信息",required = true)
     @PostMapping(value = "/publish")
@@ -49,6 +50,9 @@ public class ClassficationController {
     public void deleteClassfication(@PathVariable(value = "classficationId")Integer classficationId){
         classficationService.deleteClassfication(classficationId);
     }
+
+
+
 
 
 }

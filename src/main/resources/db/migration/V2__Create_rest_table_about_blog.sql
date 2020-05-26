@@ -11,6 +11,7 @@ CREATE TABLE `article`(
     class_id BIGINT(20) NOT NULL COMMENT '文章分类id',
     is_essence BOOL DEFAULT FALSE COMMENT '是否精华',
     is_top BOOL DEFAULT FALSE COMMENT '是否顶置' ,
+    state int DEFAULT 0 COMMENT '0 待审核 1通过 2未通过' ,
     PRIMARY KEY(id),
     KEY(user_id)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;
@@ -20,6 +21,7 @@ CREATE TABLE `article_detail`(
     id BIGINT(20) NOT NULL AUTO_INCREMENT COMMENT '文章详情id',
     article_id BIGINT(20) NOT NULL COMMENT '文章id',
     content TEXT COMMENT '文章内容',
+    content_md TEXT COMMENT '文章内容md',
     PRIMARY KEY(id),
     KEY(article_id)
 )ENGINE=INNODB DEFAULT CHARSET=utf8;

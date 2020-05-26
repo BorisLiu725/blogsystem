@@ -27,4 +27,14 @@
         where article_id = #{articleId}
     </select>
 
+    <select id="findAllByState" resultType="com.ly.blog.blogsystem.bean.Comment">
+        select * from comment
+        where state = #{state}
+    </select>
+    <update id="updateCommentStateById">
+        update comment
+        set state = #{state}
+        where id = #{id}
+    </update>
+
 </mapper>

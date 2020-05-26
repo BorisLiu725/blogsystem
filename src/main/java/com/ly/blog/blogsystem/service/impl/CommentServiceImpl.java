@@ -2,9 +2,8 @@ package com.ly.blog.blogsystem.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.ly.blog.blogsystem.bean.Article;
-import com.ly.blog.blogsystem.bean.Comment;
-import com.ly.blog.blogsystem.bean.User;
+import com.ly.blog.blogsystem.bean.*;
+import com.ly.blog.blogsystem.dto.ArticleDTO;
 import com.ly.blog.blogsystem.dto.CommentDTO;
 import com.ly.blog.blogsystem.enumeration.CommentState;
 import com.ly.blog.blogsystem.exception.ServiceException;
@@ -162,8 +161,10 @@ public class CommentServiceImpl implements CommentService {
 
         //根据文章id查找跟评论
         List<Comment> rootComments = commentMapper.findByArticleId(articleId);
+
         Article article = articleMapper.findById(articleId);
         User rootUser = userMapper.findById(article.getUserId());
+
         List<CommentFormatVO> commentFormatLists = new ArrayList<CommentFormatVO>();
         if (rootComments == null){
             return null;
@@ -176,7 +177,12 @@ public class CommentServiceImpl implements CommentService {
             commentFormatVO.setCommentId(rootComments.get(i).getId());
             commentFormatVO.setFromUserName(fromUserName);
             //根据
-            commentFormatVO.setToUserName(rootUser.getUserName());
+            if(rootComments.get(i).getFatherComment() == null){
+                commentFormatVO.setToUserName(null);
+            }else{
+                commentFormatVO.setToUserName(rootUser.getUserName());
+            }
+
             commentFormatVO.setArticleId(rootComments.get(i).getArticleId());
             commentFormatVO.setContent(rootComments.get(i).getContent());
             commentFormatVO.setSubLists(commentFormats(rootComments.get(i).getId()));
@@ -186,6 +192,21 @@ public class CommentServiceImpl implements CommentService {
         //树形转化成列表形
         treetoList(commentFormatLists,finalResult);
         return finalResult;
+    }
+
+    @Override
+    public PageInfo<Comment> findAllByState(Integer state, Integer curPage, Integer pageSize) {
+        PageHelper.startPage(curPage,pageSize);
+        List<Comment> comments = commentMapper.findAllByState(state);
+        PageInfo<Comment> pageInfo = new PageInfo<>(comments);
+        return pageInfo;
+
+    }
+
+    @Override
+    public boolean updateCommentStateById(Integer state, Integer id) {
+        Integer res = commentMapper.updateCommentStateById(state,id);
+        return res>0;
     }
 
     /**

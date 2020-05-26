@@ -48,7 +48,7 @@ public class CommentController {
         return comments;
     }
 
-    @ApiOperation(value = "查询所有文章的评论")
+    @ApiOperation(value = "查询单个文章的评论")
     @GetMapping(value = "/find/formatList/{articleId}")
     public List<CommentFormatLsitVO> findFormatCommentsAboutArticleId(@PathVariable("articleId")Integer articleId){
         List<CommentFormatLsitVO> comments;
@@ -56,4 +56,20 @@ public class CommentController {
         return comments;
     }
 
+
+    @ApiOperation(value = "查询所有文章的评论")
+    @ApiImplicitParam(name = "curPage",value = "当前页",required = true)
+    @GetMapping(value = "/find/list/state/{state}/{curPage}/{pageSize}")
+    public PageInfo<Comment> findAllComments(@PathVariable("state")Integer state,@PathVariable("curPage")Integer curPage,@PathVariable("pageSize")Integer pageSize){
+        return commentService.findAllByState(state, curPage, pageSize);
+    }
+
+
+    @ApiOperation(value = "修改评论状态")
+    @ApiImplicitParam(name = "curPage",value = "当前页",required = true)
+    @GetMapping(value = "/update/state/{state}/{id}")
+    public boolean updateCommentStateById(@PathVariable("state")Integer state,@PathVariable("id")Integer id){
+//        return commentService.findAllByState(state, curPage, pageSize);
+        return commentService.updateCommentStateById(state,id);
+    }
 }

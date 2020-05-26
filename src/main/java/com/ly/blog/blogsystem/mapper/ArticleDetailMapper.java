@@ -10,13 +10,11 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface ArticleDetailMapper {
 
-
     void insert(ArticleDetail articleDetail);
 
     ArticleDetail findByArticleId(Integer articleId);
 
-
-    void update(@Param("articleId") Integer articleId, @Param("content") String content);
+    void update(@Param("articleId") Integer articleId, @Param("content") String content,@Param("contentMd") String contentMd);
 
     void delete(@Param("articleId") Integer articleId);
 }
