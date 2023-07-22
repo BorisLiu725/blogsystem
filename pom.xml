@@ -72,7 +72,7 @@
         <dependency>
             <groupId>com.github.pagehelper</groupId>
             <artifactId>pagehelper</artifactId>
-            <version>5.1.2</version>
+            <version>5.3.1</version>
         </dependency>
         <!-- 在我的实验中不加这两个依赖分页不会成功 -->
         <dependency>
